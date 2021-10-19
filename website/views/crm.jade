@@ -1,0 +1,81 @@
+extends dashboard
+
+block elements
+  .container.crm
+    .row
+      .col-12.p-0.m-0
+        ul.nav.nav-tabs.crm-menu.p-0.m-0
+          li.nav-item
+            a.nav-link.crm-contacts.active(href='#contacts' onclick='changeSection("contacts")') 
+              i.icon-contact 
+              | Contacts
+          li.nav-item
+            a.nav-link.crm-leads(href='#leads' onclick='changeSection("leads")') 
+              i.icon-lead
+              | Leads
+          li.nav-item
+            a.nav-link.crm-deals(href='#deals' onclick='changeSection("deals")') 
+              i.icon-deal
+              | Deals
+
+      .col-12.py-4.crm-view.crm-view-loading.d-none
+        div.spinner-border.spinner-border-sm(role="status")
+          span.sr-only Loading...        
+        span.pl-2 Loading Data .. 
+        
+      .col-12.pb-4.crm-view.crm-view-contacts.d-none
+        input.form-control(type="text", placeholder="Search Contacts")
+        div
+          table.table         
+            tbody
+
+
+      .col-12.pb-4.crm-view.crm-view-leads.d-none
+        input.form-control(type="text", placeholder="Search Leads")
+        div
+          table.table
+            tbody
+
+
+      .col-12.pb-4.crm-view.crm-view-deals.d-none
+        input.form-control(type="text", placeholder="Search Deals")
+        .table-responsive
+          table.table
+            tr
+              th Name
+              th Title
+              th Company
+              th Email
+              th Phone
+              th Date Added
+              th Actions
+            tr
+              td Ahmed Mohsen 
+              td Web Developer
+              td RFID Egypt
+              td ahmed@fridegypt.com
+              td 0122222332
+              td 10 Minutes Ago
+              td 
+                i.icon-move-to.cursor-pointer.p-1.ml-1(title="Transfer to lead")
+                i.icon-edit.cursor-pointer.p-1.ml-1(title="Edit Contact")
+                i.icon-delete.text-danger.cursor-pointer.p-1.ml-1(title="Delete Contact")
+
+    div#modalContent
+    
+    div#modalLoading.d-none
+      div.wrapmodal
+        div.spinner-border.spinner-border-sm(role="status")
+          span.sr-only Loading...        
+        span.pl-2 Loading .. 
+
+      
+
+
+
+  script(src="/javascripts/crm.js" defer)
+
+
+
+
+

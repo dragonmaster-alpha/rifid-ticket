@@ -1,0 +1,175 @@
+mixin comment(by, time, comment)
+  div.row.comments.border.p-2
+    div.col-5.col-md-4
+      small.text-muted= by
+      br
+      small.text-muted.timeago= time
+    div.col-7.col-md-8
+      p= comment
+
+  
+
+extends dashboard
+
+block elements
+  div.row.p-2
+    div.col-md-4
+      h1.pb-2 Ticket
+    div.col-md-8
+      nav.float-md-right(aria-label='breadcrumb')
+        ol.breadcrumb.bg-white.pl-0
+          li.breadcrumb-item
+            a(href='#')= ticket.company.name
+          li.breadcrumb-item.active= ticket.title
+            case ticket.status
+              when "Open"
+                span.badge.badge-success.ml-3 Open
+              when "In Progress"
+                span.badge.badge-primary.ml-3 In Progress
+              when "Pending Customer"
+                span.badge.badge-warning.ml-3 Pending Customer
+              when "Closed"
+                span.badge.badge-danger.ml-3 Closed
+
+
+  div.row.p-2
+    div.col-lg-8
+      each thread in ticket.threads
+        div.card.my-4
+          div.card-header.py-2= thread.user ? thread.user.name : "deleted user"
+            if ticket.status != "Closed" && user._id.toString() == thread.user._id.toString()
+              button.btn.btn-sm.btn-outline-secondary.m-0.py-0.ml-2(onclick="editThread('#{thread._id}', this)") edit
+              button.btn.btn-sm.btn-outline-secondary.m-0.py-0.ml-2.d-none(type="button" onclick="document.forms['#{thread._id}'].submit()") save
+              form.d-none(name=thread._id, action="/tickets/editMessage/", method="POST")
+                input(type='hidden', name='id', value=ticket._id)
+                input(type='hidden', name='threadId', value=thread._id)
+                input(type='hidden', name='message', value=thread.message)
+            small.float-right.timeago= thread.time.toISOString()
+
+          div.card-body
+            p.card-text(id=thread._id)= thread.message
+            if user.role == "employee"
+              div.container-fluid.mt-3.border
+                h6.py-3.mb-0.commentsTitle(style='cursor: pointer;') Comments (#{thread.comments.length})
+                  span.float-right +
+                div.d-none
+                  each comment in thread.comments
+                    +comment(comment.user ? comment.user.name : "Deleted User", comment.time.toISOString(), comment.comment)
+                  if ticket.status != "Closed"
+                    form(method="POST", action="/tickets/addComment/#{ticket._id}")
+                      div.row.form-group.mb-0
+                        input(type="hidden", name="threadId", value=thread._id)
+                        input(type="hidden", name="user", value=user._id)
+                        input.col-9.form-control(type="text", name="comment",  placeholder="Enter Comment", required)
+                        button.col-3.btn.btn-outline-secondary Add
+
+    div.col-lg-4
+        div.card.my-4
+          div.card-header.py-2 Ticket Details 
+          div.card-body.px-5
+            dl.row
+              dt.col-12.p-2 Company:
+              dd.col-12.pb-2.text-capitalize= ticket.company ? ticket.company.name : "Deleted Company"
+              dt.col-12.p-2 Project Name:
+              dd.col-12.pb-2.text-capitalize= ticket.project ? ticket.project.name : "Deleted Project"
+              dt.col-12.p-2 Project Type:
+              dd.col-12.pb-2.text-capitalize= ticket.projectType || "Undefined"
+              dt.col-12.p-2 Created At:
+              dd.col-12.pb-2.text-capitalize= ticket.created_at.toLocaleString().replace(" ", " - ")
+              dt.col-12.p-2 Priority:
+              dd.col-12.pb-2.text-capitalize= ticket.priority
+              dt.col-12.p-2 Ticket Type:
+              dd.col-12.pb-2.text-capitalize= ticket.type
+              if ticket.responseTime
+                dt.col-12.p-2.mt-3.pt-3.border-top Response Time:
+                dd.col-12.pb-2= ticket.responseTimeN
+              if ticket.resolutionTime
+                dt.col-12.p-2 Resolution Time:
+                dd.col-12.pb-2= ticket.resolutionTimeN
+              if ticket.review && ticket.review.rating
+                dt.col-12.p-2.mt-3.pt-3.border-top Rating:
+                dd.col-12.pb-2= ticket.review.rating + " ★"
+              if ticket.review && ticket.review.description
+                dt.col-12.p-2 Review:
+                dd.col-12.pb-2.text-capitalize= ticket.review.description
+              if ticket.review && ticket.review.name
+                dt.col-12.p-2 Rated By:
+                dd.col-12.pb-2.text-capitalize= ticket.review.name
+              if user.role == "employee"
+                if ticket.contact
+                  dt.col-12.p-2 Contact Person:
+                  dd.col-12.pb-2.text-capitalize= ticket.contact.name
+                  dt.col-12.p-2 Contact Phone:
+                  dd.col-12.pb-2.text-capitalize= ticket.contact.phone
+
+
+        div.card.my-4
+          div.card-header.py-2 Attachments
+          div.card-body.p-0
+            div.list-group
+              each attachment in attachments
+                a.list-group-item.list-group-item-action(href='/upload/#{attachment._id}', target='_blank')= attachment.name
+        if ticket.status != "Closed"
+          button.btn.btn-lg.btn-block.btn-outline-secondary.mt-4(type='button' data-target='#replyModal' onclick='$("#replyModal").modal("show")') Add Reply
+          button.btn.btn-lg.btn-block.btn-outline-secondary.mt-2(type='button' data-target='#attachmentModal' onclick='$("#attachmentModal").modal("show")') Close Ticket
+          if user.role == "employee"
+            button.btn.btn-lg.btn-block.btn-outline-secondary.mt-2(type='button' data-target='#pendingModal' onclick='$("#pendingModal").modal("show")') Pending Customer
+          if ticket.owner._id.toString() == user._id.toString() || user.permissions == "admin"
+            button.btn.btn-lg.btn-block.btn-outline-secondary.mt-2(href='' type='button' onclick='document.location = "/tickets/edit/#{ticket._id}"') Edit Ticket
+
+          div.modal.fade(id="replyModal" tabindex="-1" role="dialog" aria-labelledby="replyModalLabel" aria-hidden="true")
+            div.modal-dialog(role='document')
+              div.modal-content
+                form.uploadForm(action="/tickets/newReply/#{ticket._id}", method="POST", name='uploadForm')
+                  input(type="hidden", name="owner", value=user._id)
+                  div.modal-header
+                    h5.modal-title(id='replyModalLabel') New message
+                    button.close(type='button' data-dismiss='modal' aria-label='Close')
+                      span(aria-hidden='true') &times;
+
+                  div.modal-body
+                      div.form-group
+                        label.col-form-label(for='message-text') Message:
+                        textarea.form-control(id='message-text', name="message", required)
+                      div.form-group
+                        label.col-form-label(for='attachments') Attachments
+                        input#attachments.form-control(type='file', onchange="onInputChange(this);", name='attachments')
+                        .files
+                  div.modal-footer
+                    button.btn.btn-secondary(type='button' data-dismiss='modal') Close
+                    button.btn.btn-primary(type='submit') Add message
+
+
+
+          div.modal.fade(id="attachmentModal" tabindex="-1" role="dialog" aria-labelledby="attachmentModalLabel" aria-hidden="true")
+            div.modal-dialog(role='document')
+              div.modal-content
+                div.modal-header
+                  h5.modal-title(id='attachmentModalLabel') Close Ticket
+                  button.close(type='button' data-dismiss='modal' aria-label='Close')
+                    span(aria-hidden='true') &times;
+                div.modal-body
+                  form(method="POST", action="/tickets/changeStatus/#{ticket._id}")
+                    div.form-group
+                      p Are you sure you would like to close this ticket?
+                      input(type='hidden', name='status', value='Closed')
+                    div.modal-footer
+                      button.btn.btn-secondary(type='button' data-dismiss='modal') Cancel
+                      button.btn.btn-danger(type='submit') Close Ticket
+
+          if user.role == "employee"
+            div.modal.fade(id="pendingModal" tabindex="-1" role="dialog" aria-labelledby="pendingModalLabel" aria-hidden="true")
+              div.modal-dialog(role='document')
+                div.modal-content
+                  div.modal-header
+                    h5.modal-title(id='pendingModalLabel') Pending Customer Action
+                    button.close(type='button' data-dismiss='modal' aria-label='Close')
+                      span(aria-hidden='true') &times;
+                  div.modal-body
+                    form(method="GET", action="/tickets/pending/#{ticket._id}")
+                      div.form-group
+                        p Change ticket to Pending Customer Action?
+                      div.modal-footer
+                        button.btn.btn-secondary(type='button' data-dismiss='modal') Cancel
+                        button.btn.btn-danger(type='submit') Change Status
+

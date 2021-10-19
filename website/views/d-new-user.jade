@@ -1,0 +1,51 @@
+extends dashboard
+
+block elements
+  h1 New User
+  form.mt-5(action='/users/new' method='POST')
+    .form-group.row
+      label.col-sm-2.col-form-label.col-form-label-lg(for='name') Name
+      .col-sm-10
+        input#name.form-control.form-control-lg(type='text', placeholder='Display Name', name='name')
+    .form-group.row
+      label.col-sm-2.col-form-label.col-form-label-lg(for='title') Title
+      .col-sm-10
+        input#title.form-control.form-control-lg(type='text', placeholder='Title', name='title')
+    .form-group.row
+      label.col-sm-2.col-form-label.col-form-label-lg(for='email') Email
+      .col-sm-10
+        input#email.form-control.form-control-lg(type='email', placeholder='Email to receive notifications', name='email')
+    .form-group.row
+      label.col-sm-2.col-form-label.col-form-label-lg(for='phone') Phone
+      .col-sm-10
+        input#phone.form-control.form-control-lg(type='text', placeholder='Mobile number', name='phone')
+    .form-group.row
+      label.col-sm-2.col-form-label.col-form-label-lg Account
+      .col-sm-10
+        .form-check.form-check-inline.p-3
+          input#typeCustomer.form-check-input(type='radio', name='type', value='customer', checked='' onchange="this.checked && isCustomer()")
+          label.form-check-label(for='typeCustomer') Customer
+        .form-check.form-check-inline.p-3
+          input#typeEmployee.form-check-input(type='radio', name='type', value='employee', checked=''  onchange="this.checked && isEmployee()" selected)
+          label.form-check-label(for='typeEmployee') Employee
+    .form-group.row
+      label.col-sm-2.col-form-label.col-form-label-lg(for='perm') Permissions
+      .col-sm-10
+        select#perm.form-control.form-control-lg(name='permission' onchange="this.value == 'admin' ? isAdmin() : isNotAdmin() ", required)
+          option(value='auditor', selected) Auditor - Only view
+          option(value='member') Member - View and reply
+          option(value='admin') Admin - View, reply and manage users
+    .form-group.row
+      label.col-sm-2.col-form-label.col-form-label-lg(for='company') Companies
+      .col-sm-10
+        select#companies.form-control.form-control-lg(multiple name='companies' required)
+          each company in companies
+            option(value=company._id, data-projects=company.projects.map(project => project.project._id))= company.name
+    .form-group.row
+      label.col-sm-2.col-form-label.col-form-label-lg(for='projects') Projects
+      .col-sm-10
+        select#projects.form-control.form-control-lg(multiple name='projects')
+          each project in projects
+            option(value=project._id)= project.name
+
+    button.btn.btn-lg.btn-success.float-right.mt-3(type='submit') Create User

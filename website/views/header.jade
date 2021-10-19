@@ -1,0 +1,42 @@
+header.container-fluid.py-3.px-4
+  div.row
+    div.col-3.col-sm-1
+      a(href="://rfidegypt.com/")
+        img.logo(src='/images/logo.png' alt='RFID Egypt Logo')
+    div.col-9.col-sm-5.order-sm-3
+      table.ml-2
+        tr
+          td
+            img(src='/images/support.png' alt='RFID Egypt Support')
+          td.p-2
+            span.hotline Hotline
+            br
+            span.phone 01200002770
+          td
+            a(href='https://www.facebook.com/RfidEgypt/' target='_blank')
+              img.icon(src='/images/fb.png' alt="RFID Egypt Facebook")
+            br
+            a(href='https://www.youtube.com/channel/UC3NvIKc5binzHNB6YjjglxQ' target='_blank')
+              img.icon(src='/images/youtube.png' alt="RFID Egypt Youtube")
+    div.col-12.col-sm-6.order-sm-2
+      - if (user)
+        p.float-left.font-weight-bold.pt-3.pl-3 Welcome, 
+          span.color-blue #{user.name}
+        .btn-group
+        button.btn.m-2.float-right.float-sm-left.dropdown-toggle(type='button', data-toggle='dropdown')
+          - var activeNotifications = user.notifications.filter(noti => noti.active).length || 0
+          span#notificationsCount.badge(class=activeNotifications ? "badge-danger" : "badge-success")= activeNotifications
+        .dropdown-menu.row.py-0.notifications
+          .col-12.py-3.border.bg-light
+            span.h5.mr-4
+              | Notifications
+            button.btn.btn-outline-secondary.py-0.mx-2(onclick="notifcationsRead()") ALL READ
+            button.btn.btn-outline-secondary.py-0.mx-2(onclick="clearNotifications()") CLEAR ALL
+          if(user.notifications.length)
+            each notification in user.notifications.sort(not => !not.active)
+              .col-12.p-4.border.cursor-pointer.notification(onclick="viewNotification('#{notification.id}', '#{notification.link}')")
+                p.my-0.py-0(class=notification.active && "font-weight-bold")= notification.text
+                abbr.my-0.py-0.text-muted.timeago= notification.time.toISOString()
+          else
+            .col-12.border.p-4.m-0
+              p No New Notifications 

@@ -1,0 +1,35 @@
+extends dashboard
+
+block elements
+  h1 New Company
+  form.mt-5(action='/companies/new', method='POST')
+    .form-group.row
+      label.col-sm-2.col-form-label.col-form-label-lg(for='name') Name
+      .col-sm-10
+        input#name.form-control.form-control-lg(type='text', required, name='name' placeholder='Company Name')
+    .form-group.row.mt-4
+      label.col-sm-2.col-form-label.col-form-label-lg Projects
+        button#addCompanyProject.btn.btn-outline-danger.m-3.m-sm-0.mt-sm-3(type='button') Add
+      .col-sm-10.projectsContainer
+        .row.my-2.addCompany
+          .col-12.my-2
+            p Support Type
+            select.form-control.form-control-lg(name='support')
+              each support in supportType
+                option(value='#{support.value}')= support.label
+          .col-12.my-2
+            p Start Date
+            input.form-control.form-control-lg.datepicker-here(type='text' placeholder='Start Date' data-position='bottom left' data-language='en' name='start' required)
+          .col-12.my-2
+            p End Date
+            input.form-control.form-control-lg.datepicker-here(type='text' placeholder='End Date' data-position='bottom left' data-language='en' name='expiration' required)
+          .col-12.my-2
+            p Project
+            select.form-control.form-control-lg(name='project')
+              each project in projects
+                option(value=project._id)= project.name
+          .col-12.my-2
+            button.btn.btn-danger.mt-2.float-right(onclick='$(this).parent().parent().remove();' type='button') Remove Project
+          .col-12.my-2
+            hr.my-5    
+    button.btn.btn-lg.btn-success.float-right(type='submit') Create Company

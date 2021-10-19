@@ -1,0 +1,44 @@
+extends dashboard
+
+block elements
+  h1 Edit Company
+  form.mt-5
+    .form-group.row
+      label.col-sm-2.col-form-label.col-form-label-lg(for='name') Name
+      .col-sm-10
+        input#name.form-control.form-control-lg(type='text', required, placeholder='Company Name' value='Nissan')
+    .form-group.row.mt-4
+      label.col-sm-2.col-form-label.col-form-label-lg Projects
+        button#addCompanyProject.btn.btn-outline-danger.m-3.m-sm-0.mt-sm-3 Add
+      .col-sm-10.projectsContainer
+        .row.my-2.addCompany
+          .col-12.my-2
+            p Support Type
+            span.mx-2.mb-4
+              input.mx-2#supportVIP(type='radio' name="support" checked)
+              label(for='supportVIP') VIP 
+            span.mx-2
+              input.mx-2#supportRegular(type='radio' name="support")
+              label(for='supportRegular') Regular
+
+          .col-12.my-2
+            p Expiration
+            input.form-control.form-control-lg.datepicker-here(type='text' placeholder='Expires on' data-position='bottom left' data-language='en' value='11/02/2019')
+          .col-12.my-2
+            p Project
+            select.form-control.form-control-lg
+              option IPark
+              option Attendance
+          .col-12.my-2
+            p Users
+            select.form-control.form-control-lg(multiple)
+              option(selected) Ahmed Mohsen
+              option(selected) Mostafa
+              option Mahmoud Sherif
+          .col-12.my-2
+            button.btn.btn-danger.mt-2.float-right(onclick='$(this).parent().parent().remove();') Remove Project
+          .col-12.my-2
+            hr.my-5    
+    button.btn.btn-lg.btn-success.float-right(type='submit') Create Company
+        
+    

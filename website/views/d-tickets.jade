@@ -1,0 +1,64 @@
+extends dashboard
+
+block elements    
+  .row.p-4
+    .col-8
+      h1 Tickets
+    .col-4
+      a.btn.btn-outline-danger.float-right(href='/tickets/new') New
+      button#export.btn.btn-outline-danger.float-right.mr-2.d-none(onclick="exportToExcel('tickets.xls')") Export  
+
+  .row
+    .col-12.mb-2
+      input.form-control#search(onkeyup="filterTickets()", placeholder="Search Tickets Title & Threads", value="")
+    .col-4.mb-2
+      if user.role == "employee"
+        select#company.custom-select(onchange="filterTickets()")
+          option(value="null") All Companies
+      else
+        | 
+    .col-4.mb-2
+      select#project.custom-select(onchange="filterTickets()")
+        option(value="null") All Projects
+    .col-4.mb-2
+      select#status.custom-select(onchange="filterTickets()")
+        option(value="null") All Status
+        option(value="Open") Open
+        option(value="Pending Customer") Pending Customer
+        option(value="In Progress") In Progress
+        option(value="Closed") Closed
+          
+  div.row.table-responsive
+    table.table.table-hover.exportable
+      thead.thead-light
+        tr.w-auto
+          th Project
+          th Type
+          th Company
+          th Ticket Title
+          th Created By
+          th Last Update
+          th Status
+      tbody
+        if tickets.length
+          each ticket in tickets
+            tr.cursor-pointer.filter-ticket(onclick="window.location = '/tickets/#{ticket._id}'", data-status=ticket.status, data-company=ticket.company.name,  data-project=ticket.project.name, data-search=(ticket.title+"-"+(ticket.threads.map(thread => thread.message))) )
+              td.text-capitalize= ticket.project ? ticket.project.name : "Deleted Project"
+              td.text-capitalize= ticket.project ? ticket.projectType : "Deleted Project"
+              td.text-capitalize= ticket.company  ? ticket.company.name : "Deleted Company"
+              td.text-capitalize= ticket.title
+              td.text-capitalize= ticket.threads[0].user.name
+              td.text-capitalize.timeago= ticket.updatedAt.toISOString()
+              td.text-capitalize
+                case ticket.status
+                  when "Open"
+                    span.badge.badge-success.ml-3 Open
+                  when "In Progress"
+                    span.badge.badge-primary.ml-3 In Progress
+                  when "Pending Customer"
+                    span.badge.badge-warning.ml-3 Pending Customer
+                  when "Closed"
+                    span.badge.badge-danger.ml-3 Closed
+        else
+          tr
+            td.text-center(colspan='6') No Tickets Available

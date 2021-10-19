@@ -1,0 +1,44 @@
+extends layout
+
+block content
+  include ./header.jade
+  section.container-fluid.main.dashboard.px-3.py-5
+    div.color-overlay
+    div.row.px-3.px-md-5
+      div.col-12.d-none.col-md-3.d-md-block.pr-md-5.menu
+        a.btn.btn-primary.btn-lg.btn-block(href='/tickets/new') New Ticket
+        a.btn.btn-primary.btn-lg.btn-block(href='/dashboard') 
+          | Dashboard
+          //span.badge.badge-danger.ml-2.malerts 2
+        a.btn.btn-primary.btn-lg.btn-block(href='/tickets') Tickets
+        if(user.role == "employee")
+          if(user.permissions == "admin")
+            a.btn.btn-primary.btn-lg.btn-block(href='/users') Users
+            a.btn.btn-primary.btn-lg.btn-block(href='/companies') Companies
+            a.btn.btn-primary.btn-lg.btn-block(href='/projects') Projects
+          a.btn.btn-primary.btn-lg.btn-block(href='/tasks') Tasks
+          a.btn.btn-primary.btn-lg.btn-block(href='/contacts') Contacts
+
+        a.btn.btn-primary.btn-lg.btn-block(href='/profile') Profile
+        a.btn.btn-danger.btn-lg.btn-block.mt-5(href='/users/signout') Sign out
+      div.col-12.d-md-none.p-0
+        div.btn-group.float-right
+          button.btn.btn-primary.btn-lg.dropdown-toggle(type='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false') Menu
+          div.dropdown-menu.dropdown-menu-right
+            a.dropdown-item.py-3(href='/tickets/new') New Ticket
+            a.dropdown-item.py-3(href='/dashboard') 
+              | Dashboard &nbsp; 
+              //span.badge.badge-danger.malerts 2
+            a.dropdown-item.py-3(href='/tickets') Tickets
+            if(user.role == "employee")
+              if(user.permissions == "admin")
+                a.dropdown-item.py-3(href='/users') Users
+                a.dropdown-item.py-3(href='/companies') Companies
+                a.dropdown-item.py-3(href='/projects') Projects
+              a.dropdown-item.py-3(href='/tasks') Tasks
+              a.dropdown-item.py-3(href='/contacts') Contacts
+            a.dropdown-item.py-3(href='/profile') Profile
+            a.dropdown-item.py-3(href='/users/signout') Sign out
+      div.col-12.col-md-9.content.p-3.p-md-5
+        != messages('my_message_template', locals)
+        block elements

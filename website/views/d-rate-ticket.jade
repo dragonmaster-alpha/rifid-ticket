@@ -1,0 +1,35 @@
+extends dashboard
+
+block elements
+    - var rated = ticket.review && ticket.review.rating
+    .row
+      .col-12
+        h1.my-4 Rate Ticket
+      .col-12
+        dl
+          dt Ticket Title
+          dd.mb-4= ticket.title
+          dt Ticket Date
+          dd.mb-4= ticket.created_at.toLocaleString().replace(" ", " - ")
+          dt Initial Problem
+          dd.mb-4= ticket.threads[0].message
+          if rated
+            dt Rating
+            dd.mb-4= ticket.review.rating + " ★"
+            dt Comments
+            dd.mb-4= ticket.review.description || "No comments added"
+            dt Rated By
+            dd.mb-4= ticket.review.name
+          
+    if !rated
+      .col-12.mt-3
+        form(action="/tickets/rate/#{ticket._id}" method="POST")
+          .form-group
+             h6 How would you rate this ticket?
+             input(type='hidden', name='rating' value='0')
+             .my-rating
+          .form-group
+            label(for='details') Any suggestions for future improvements?
+            textarea#details.form-control(rows='3' style='max-width:400px;', name='details')
+
+           button.btn.btn-lg.btn-success.float-right.mt-3(type='submit') Confirm

@@ -1,0 +1,39 @@
+extends dashboard
+
+block elements
+  .row.p-4
+    .col-8
+      h1 Companies
+    .col-4
+      a.btn.btn-outline-danger.float-right(href='/companies/new') New
+  .row
+    - if(companies.length >= 1)
+      each company in companies
+        .col-sm-6.col-lg-4
+          .card
+            .card-body
+              h5.card-title= company.name
+              p.text-muted= company.projects.length > 1 ? company.projects.length + " Projects" : company.projects.length + " Project"
+              a.btn.btn-outline-secondary.btn-sm.mr-2(href="/companies/edit/#{company.name.replace(' ', '-')}") Edit
+              a.btn.btn-outline-danger.btn-sm.mx-2(href='#' data-toggle='modal', data-target='#confirmDelete' onclick="$('#delId').val('#{company._id}'); $('#delName').text('#{company.name}');") Delete
+    - else
+      p.pl-3.m-2.mx-4 No companies found
+
+
+    #confirmDelete.modal.fade(tabindex='-1', role='dialog', aria-labelledby='confirmDelete', aria-hidden='true')
+      .modal-dialog(role='document')
+        .modal-content
+          .modal-header
+            h5#exampleModalLabel.modal-title Confirm Delete
+            button.close(type='button', data-dismiss='modal', aria-label='Close')
+              span(aria-hidden='true') ×
+          .modal-body
+            | Are you sure you want to delete 
+            span#delName company
+            |?
+          .modal-footer
+            button.btn.btn-secondary(type='button', data-dismiss='modal') Close
+            form(method="POST" action="/companies/delete")
+              input(id='delId' type='hidden' name='id' value='')
+              button.btn.btn-danger(type='submit') Delete Company
+

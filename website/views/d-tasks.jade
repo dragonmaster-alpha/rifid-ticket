@@ -1,0 +1,61 @@
+extends dashboard
+
+block elements    
+  .row.p-4
+    .col-8
+      h1 Tasks
+    .col-4
+      a.btn.btn-outline-danger.float-right(href='/tasks/new') New
+      button#export.btn.btn-outline-danger.float-right.mr-2.d-none(onclick="exportToExcel('tasks.xls')") Export
+      
+  .row
+    .col-8.mb-2
+      input.form-control#search(onkeyup="search()", placeholder="Search Tasks", value="")
+    .col-4.mb-2
+      select#status.custom-select(onchange="search()")
+        option(value="null") All Status
+        option(value="Open") Active
+        option(value="In Progress") In Progress
+        option(value="Complete") Complete
+
+
+  div.table-responsive
+    table.table.table-hover.exportable
+      thead.thead-light
+        tr.w-auto
+          th Type
+          th Contact
+          th Assigned To
+          th Description
+          th Last Update
+          th Status
+      tbody
+        if tasks.length
+          each task in tasks
+            tr.cursor-pointer.searchable(onclick="window.location = '/tasks/view/#{task._id}'", data-status=task.status, data-search=(task.description+"-"+ (task.contact ? task.contact.name : "") +"-"+task.type+"-"+ (task.employee ? task.employee.name: "")))
+              td.text-capitalize= task.type ? task.type : "-"
+              td.text-capitalize= task.contact ? task.contact.name : "-"
+              td.text-capitalize= task.employee ? task.employee.name : "-"
+              td.text-capitalize= task.description ? task.description : "-"
+              td.text-capitalize.timeago= task.updatedAt.toISOString()
+              td.text-capitalize
+                case task.status
+                  when "Active"
+                    span.badge.badge-success.ml-3 Active
+                  when "In Progress"
+                    span.badge.badge-primary.ml-3 In Progress
+                  when "Complete"
+                    span.badge.badge-danger.ml-3 Complete
+        else
+          tr
+            td.text-center(colspan='5') No Tasks Available
+
+
+//    .row
+      .col-6.mb-2
+        input.form-control#search(onkeyup="", placeholder="Search Tasks", value="")
+      .col-6.mb-2
+        select#status.custom-select(onchange="")
+          option(value="null") All Status
+          
+

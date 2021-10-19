@@ -1,0 +1,18 @@
+extends dashboard
+
+block elements
+  h1 Edit Project
+  form.mt-5(method="POST", action="/projects/edit/#{project._id}")
+    input(type='hidden' name='oldname' value='#{project.name}')
+    .form-group.row
+      label.col-sm-2.col-form-label.col-form-label-lg(for='name') Name
+      .col-sm-10
+        input#name.form-control.form-control-lg(type='text', placeholder='Project Name', name='name', value="#{project.name}")
+    .form-group.row
+      label.col-sm-2.col-form-label.col-form-label-lg(for='description') Description
+      .col-sm-10
+        textarea#company.form-control.form-control-lg(placeholder='Project description', name='description')= project.description
+    button.btn.btn-lg.btn-success.float-right.mt-3(type='submit') Update Project
+    
+        
+    

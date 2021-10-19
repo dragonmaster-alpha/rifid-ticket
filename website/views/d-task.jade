@@ -1,0 +1,116 @@
+mixin comment(by, time, comment)
+  div.row.comments.border.p-2
+    div.col-5.col-md-4
+      small.text-muted= by
+      br
+      small.text-muted= time
+    div.col-7.col-md-8
+      p= comment
+
+  
+
+extends dashboard
+
+block elements
+  div.row.p-2
+    div.col-12
+      h1.p-4 
+        | Task
+        if task.status != "Complete" && task.from.toString() == user._id.toString()
+          button.float-right.btn.btn-outline-danger.mt-2(type='button', onclick="window.location='/tasks/edit/#{task._id}'") Edit Task
+
+  div.row.p-2
+    .col-12.p-4
+      dl.row
+        dt.col-12.p-2 Status:
+        dd.col-12.pb-2.text-capitalize
+          case task.status
+            when "Active"
+              span.badge.badge-success.ml-3 Active
+            when "In Progress"
+              span.badge.badge-primary.ml-3 In Progress
+            when "Complete"
+              span.badge.badge-danger.ml-3 Complete
+        dt.col-12.p-2 Type:
+        dd.col-12.pb-2.text-capitalize= task.type ? task.type : "-"
+        dt.col-12.p-2 Description:
+        dd.col-12.pb-2.text-capitalize= task.description ? task.description : "-"
+        dt.col-12.p-2 Last Update:
+        dd.col-12.pb-2.text.timeago= task.updatedAt.toISOString()
+        if task.contact
+          dt.col-12.p-2 Contact:
+          dd.col-12.pb-2.text
+            | Name: #{task.contact.name}
+            br
+            | Title: #{task.contact.title}
+            br
+            | Company: #{task.contact.company}
+            br
+            | Phone: #{task.contact.mobile}
+            br
+            | Email: #{task.contact.email}
+        if task.uploads.length
+          dt.col-12.p-2.mt-4 Uploads:
+          dd.col-12.pb-2.text
+            each upload in task.uploads
+              a(href='/upload/#{upload._id}', target='_blank')= upload.name
+              br
+        if task.completedTime
+          dt.col-12.p-2.mt-4 Completed in:
+          dd.col-12.pb-2.text= task.completedTime
+
+    .col-12.col-md-8.my-2
+      div.container-fluid.mt-3.border
+        h6.py-3.mb-0 Comments (#{task.comments.length})
+        div
+          each comment in task.comments
+            +comment(comment.user ? comment.user.name : "-", comment.newtime, comment.comment)
+          if task.status != "Complete"
+            form(method="POST", action="/tasks/addComment/#{task._id}")
+              div.row.form-group.mb-0
+                input.col-9.form-control(type="text", name="comment",  placeholder="Enter Comment", required)
+                button.col-3.btn.btn-outline-secondary Add
+      
+    .col-12.mt-2
+      if task.status != "Complete"
+        if task.status == "Active"
+          button.btn.btn-lg.btn-outline-primary.m-2(type='button' data-target='#attachmentModal' onclick='$("#progressModal").modal("show")') Task In Progess
+        if task.status == "In Progress"
+          button.btn.btn-lg.btn-outline-danger.m-2(type='button' data-target='#attachmentModal' onclick='$("#completeModal").modal("show")') Task Complete
+
+    div.modal.fade(id="progressModal" tabindex="-1" role="dialog" aria-labelledby="progressModalLabel" aria-hidden="true")
+      div.modal-dialog(role='document')
+        div.modal-content
+          div.modal-header
+            h5.modal-title(id='progressModalLabel') Change status to in progress
+            button.close(type='button' data-dismiss='modal' aria-label='Close')
+              span(aria-hidden='true') &times;
+          div.modal-body
+            form(method="GET", action="/tasks/status/#{task._id}/progress")
+              div.form-group
+                p Change task status to "In Progress"?
+              div.modal-footer
+                button.btn.btn-secondary(type='button' data-dismiss='modal') Cancel
+                button.btn.btn-danger(type='submit') Change Status
+
+    div.modal.fade(id="completeModal" tabindex="-1" role="dialog" aria-labelledby="completeModalLabel" aria-hidden="true")
+      div.modal-dialog(role='document')
+        div.modal-content
+          div.modal-header
+            h5.modal-title(id='completeModalLabel') Change status to complete
+            button.close(type='button' data-dismiss='modal' aria-label='Close')
+              span(aria-hidden='true') &times;
+          div.modal-body
+            form(method="GET", action="/tasks/status/#{task._id}/complete")
+              div.form-group
+                p Change task status to "Complete"?
+              div.modal-footer
+                button.btn.btn-secondary(type='button' data-dismiss='modal') Cancel
+                button.btn.btn-danger(type='submit') Change Status
+
+
+
+
+
+
+

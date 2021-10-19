@@ -1,0 +1,78 @@
+extends dashboard
+
+block elements
+  .row.p-4
+    .col-8
+      h1 Users
+    .col-4
+      a.btn.btn-outline-danger.float-right(href='/users/new') New
+  .row.px-4
+    .col-12.mb-2
+      input.form-control#search(onkeyup="search()", placeholder="Search Users", value="")
+      
+  if users
+    h2.m-4 Employees
+    .row.m-2.mb-5
+      if employees.length > 0
+        each employee in employees
+          .col-sm-6.col-lg-4.searchable(data-search=(employee.name+"-"+employee.permissions+"-"+employee.companies.map(c => c.name)))
+            .card
+              .card-body
+                h5.card-title.text-capitalize= employee.name
+                  if employee.password
+                    if !employee.active
+                      span.badge.badge-pill.badge-warning.float-right(style='font-size:0.4em;') &nbsp;
+                    else
+                      span.badge.badge-pill.badge-success.float-right(style='font-size:0.4em;') &nbsp;
+                  else 
+                    span.badge.badge-pill.badge-danger.float-right(style='font-size:0.4em;') &nbsp;
+                p.card-text.mb-0.text-capitalize= employee.permissions
+                p.card-text.text-muted.mt-0.text-capitalize= employee.companies.map(i => i.name).join(', ')
+                a.btn.btn-outline-secondary.btn-sm.mr-2(href="/users/edit/#{employee.name.replace(' ', '-')}") Edit
+                a.btn.btn-outline-danger.btn-sm.mx-2(href='#' data-toggle='modal', data-target='#confirmDelete' onclick="$('#delId').val('#{employee._id}'); $('#delName').text('#{employee.name}');") Delete
+      else
+        .col-sm-6.col-lg-4
+          p No employees found
+      
+    h2.m-4.mt-5 Customers   
+    .row.m-2
+      if customers.length > 0
+        each customer in customers
+          .col-sm-6.col-lg-4.searchable(data-search=(customer.name+"-"+customer.permissions+"-"+customer.companies.map(c => c.name)))
+            .card
+              .card-body
+                h5.card-title.text-capitalize= customer.name
+                  if customer.password
+                    if !customer.active
+                      span.badge.badge-pill.badge-warning.float-right(style='font-size:0.4em;') &nbsp;
+                    else
+                      span.badge.badge-pill.badge-success.float-right(style='font-size:0.4em;') &nbsp;
+                  else 
+                    span.badge.badge-pill.badge-danger.float-right(style='font-size:0.4em;') &nbsp;
+
+                p.card-text.mb-0.text-capitalize= customer.permissions
+                p.card-text.text-muted.mt-0.text-capitalize= customer.companies.map(i => i.name).join(', ')
+                a.btn.btn-outline-secondary.btn-sm.mr-2(href="/users/edit/#{customer.name.replace(' ', '-')}") Edit
+                a.btn.btn-outline-danger.btn-sm.mx-2(href='#' data-toggle='modal', data-target='#confirmDelete' onclick="$('#delId').val('#{customer._id}'); $('#delName').text('#{customer.name}');") Delete
+      else
+        .col-sm-6.col-lg-4
+          p No customers found
+  else
+    p.pl-4.m-2 No users found
+  #confirmDelete.modal.fade(tabindex='-1', role='dialog', aria-labelledby='confirmDelete', aria-hidden='true')
+    .modal-dialog(role='document')
+      .modal-content
+        .modal-header
+          h5#exampleModalLabel.modal-title Confirm Delete
+          button.close(type='button', data-dismiss='modal', aria-label='Close')
+            span(aria-hidden='true') ×
+        .modal-body
+            | Are you sure you want to delete 
+            span#delName user
+            |?
+        .modal-footer
+          button.btn.btn-secondary(type='button', data-dismiss='modal') Close
+          form(method="POST" action="/users/delete")
+            input(id='delId' type='hidden' name='id' value='')
+            button.btn.btn-danger(type='submit') Delete User
+

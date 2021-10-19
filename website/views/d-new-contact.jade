@@ -1,0 +1,32 @@
+extends dashboard
+
+block elements
+  h1 New Contact
+  form.mt-5(action='/contacts/new' method='POST')
+    .form-group.row
+      label.col-sm-2.col-form-label.col-form-label-lg(for='name') Name
+      .col-sm-10
+        input#name.form-control.form-control-lg(type='text', placeholder='Display Name', name='name')
+    .form-group.row
+      label.col-sm-2.col-form-label.col-form-label-lg(for='title') Title
+      .col-sm-10
+        input#title.form-control.form-control-lg(type='text', placeholder='Title', name='title')
+    .form-group.row
+      label.col-sm-2.col-form-label.col-form-label-lg(for='company') Company
+      .col-sm-10
+        input#company.form-control.form-control-lg(type='text', placeholder='Company', name='company')
+    .form-group.row
+      label.col-sm-2.col-form-label.col-form-label-lg(for='city') City
+      .col-sm-10
+        select#city.form-control.form-control-lg(type='text', placeholder='City', name='city')
+        script(src='/javascripts/cities.js')
+    .form-group.row
+      label.col-sm-2.col-form-label.col-form-label-lg(for='email') Email
+      .col-sm-10
+        input#email.form-control.form-control-lg(type='email', placeholder='Email', name='email')
+    .form-group.row
+      label.col-sm-2.col-form-label.col-form-label-lg(for='phone') Phone
+      .col-sm-10
+        input#phone.form-control.form-control-lg(type='text', placeholder='Mobile number', name='phone')
+
+    button.btn.btn-lg.btn-success.float-right.mt-3(type='submit') Add Contact

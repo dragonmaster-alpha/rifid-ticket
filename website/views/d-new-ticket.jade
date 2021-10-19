@@ -1,0 +1,62 @@
+extends dashboard
+
+block elements
+  h1 New Ticket
+  form.mt-5.uploadForm(enctype="multipart/form-data" method="post", action='/tickets/new', name="uploadForm")
+    .form-group.row
+      label.col-sm-2.col-form-label.col-form-label-lg(for='title') Title
+      .col-sm-10
+        input#title.form-control.form-control-lg(type='text', placeholder='What is this ticket about?', name='title', required)
+    if user.role != "customer"
+      .form-group.row
+        label.col-sm-2.col-form-label.col-form-label-lg(for='priority') Priority
+        .col-sm-10
+          select#priority.form-control.form-control-lg(name='priority', required)
+            option(value='low') Low
+            option(value='medium', selected) Medium
+            option(value='high') High
+      .form-group.row
+        label.col-sm-2.col-form-label.col-form-label-lg(for='type') Type
+        .col-sm-10
+          select#type.form-control.form-control-lg(name='type', required)
+            option(value='visit') Visit
+            option(value='online', selected) Online
+    .form-group.row
+      label.col-sm-2.col-form-label.col-form-label-lg(for='project') Company
+      .col-sm-10
+        select#company.form-control.form-control-lg(name='company', onchange='setProjects()', required)
+          each company in companies
+            if user.permissions == "admin"
+              option(value=company._id, data-projects=company.projects.map(project => project.project._id).join(','))= company.name
+            else
+              if user.companies.indexOf(company._id) > -1
+                option(value=company._id, data-projects=company.projects.map(project => project.project._id).join(','))= company.name
+    .form-group.row
+      label.col-sm-2.col-form-label.col-form-label-lg(for='project') Project
+      .col-sm-10
+        select#project.form-control.form-control-lg(name='project', onchange="setProjName()", required)
+          each project in projects
+            if user.permissions == "admin"
+              option(value=project._id)= project.name
+            else
+              if user.projects.indexOf(project._id) > -1
+                option(value=project._id)= project.name
+        input#projectName(type='hidden', name='projectName')
+    .form-group.row
+      label.col-sm-2.col-form-label.col-form-label-lg(for='message') Message
+      .col-sm-10
+        textarea#message.form-control.form-control-lg(rows='5', name='message', required)
+    if user.permissions == "admin"
+      .form-group.row
+        label.col-sm-2.col-form-label.col-form-label-lg(for='users') Users
+        .col-sm-10
+          select#users.form-control.form-control-lg(multiple, name='users', required)
+            each cuser in users
+              option(value=cuser._id)= cuser.name
+    .form-group.row
+      label.col-sm-2.col-form-label.col-form-label-lg(for='attachments') Attachments
+      .col-sm-10
+        input#attachments.form-control.form-control-lg(type='file', onchange="onInputChange(this);", name='attachments', val)
+        .files
+
+    button.btn.btn-lg.btn-success.float-right.mt-3(type='submit') Create Ticket

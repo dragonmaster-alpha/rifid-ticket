@@ -1,0 +1,69 @@
+extends dashboard
+
+block elements
+  h1 Edit User
+    a.btn.btn-outline-danger.float-right(href="javascript: void()", ondblclick="window.location = '/resetPassword/#{cuser._id}'") Double Click To Reset Password
+  form.mt-5(action='/users/edit/#{cuser._id}' method='POST')
+    .form-group.row
+      label.col-sm-2.col-form-label.col-form-label-lg(for='name') Name
+      .col-sm-10
+        input#name.form-control.form-control-lg(type='text', placeholder='Display Name', name='name', value=cuser.name, disabled=!cuser.active)
+        input(type='hidden', name='oldname', value=cuser.name)
+    .form-group.row
+      label.col-sm-2.col-form-label.col-form-label-lg(for='title') Title
+      .col-sm-10
+        input#title.form-control.form-control-lg(type='text', placeholder='Title', name='title', value=(cuser.title || ""), disabled=!cuser.active)
+    .form-group.row
+      label.col-sm-2.col-form-label.col-form-label-lg(for='email') Email
+      .col-sm-10
+        input#email.form-control.form-control-lg(type='email', placeholder='Email to receive notifications', name='email', value=cuser.email, disabled=!cuser.active)
+    .form-group.row
+      label.col-sm-2.col-form-label.col-form-label-lg(for='phone') Phone
+      .col-sm-10
+        input#phone.form-control.form-control-lg(type='text', placeholder='Mobile number', name='phone', value=cuser.phone, disabled=!cuser.active)
+    .form-group.row
+      label.col-sm-2.col-form-label.col-form-label-lg Account
+      .col-sm-10
+        .form-check.form-check-inline.p-3
+          if cuser.role == "customer"
+            input#typeCustomer.form-check-input(type='radio', name='type', value='customer', checked, onchange="this.checked && isCustomer()", disabled=!cuser.active)
+          else
+            input#typeCustomer.form-check-input(type='radio', name='type', value='customer', onchange="this.checked && isCustomer()", disabled=!cuser.active)
+          label.form-check-label(for='typeCustomer') Customer
+        .form-check.form-check-inline.p-3
+          if cuser.role == "employee"
+            input#typeEmployee.form-check-input(type='radio', name='type', value='employee', checked, onchange="this.checked && isEmployee()", disabled=!cuser.active)
+          else
+            input#typeEmployee.form-check-input(type='radio', name='type', value='employee' onchange="this.checked && isEmployee()", disabled=!cuser.active)
+          label.form-check-label(for='typeEmployee') Employee
+    .form-group.row
+      label.col-sm-2.col-form-label.col-form-label-lg(for='perm') Permissions
+      .col-sm-10
+        select#perm.form-control.form-control-lg(name='permission', onchange="this.value == 'admin' ? isAdmin() : isNotAdmin()", required, disabled=!cuser.active)
+          option(value='auditor' selected=cuser.permissions == 'auditor') Auditor - Only view
+          option(value='member' selected=cuser.permissions == 'member') Member - View and reply
+          option(value='admin' selected=cuser.permissions == 'admin', disabled=cuser.role=="customer") Admin - View, reply and manage users
+    .form-group.row
+      label.col-sm-2.col-form-label.col-form-label-lg(for='company') Companies
+      .col-sm-10
+        select#companies.form-control.form-control-lg(multiple=cuser.role == "employee", name='companies', required, disabled=!cuser.active)
+          each company in companies
+            if cuser.companies.indexOf(company._id) > -1
+              option(value=company._id selected)= company.name
+            else
+              option(value=company._id)= company.name
+    .form-group.row
+      label.col-sm-2.col-form-label.col-form-label-lg(for='projects') Projects
+      .col-sm-10
+        select#projects.form-control.form-control-lg(multiple name='projects', disabled=!cuser.active)
+          each project in projects
+            if cuser.projects.indexOf(project._id) > -1
+              option(value=project._id selected)= project.name
+            else
+              option(value=project._id)= project.name
+
+    button.btn.btn-lg.btn-success.float-right.mt-3(type='submit', disabled=!cuser.active) Update User
+    if cuser.active
+      a.btn.btn-outline-warning.mt-3(href="javascript: void()", ondblclick="window.location = '/users/pause/#{cuser._id}'") Double Click To Pause Account
+    else
+      a.btn.btn-outline-success.mt-3(href="javascript: void()", ondblclick="window.location = '/users/activate/#{cuser._id}'") Double Click To Actviate Account

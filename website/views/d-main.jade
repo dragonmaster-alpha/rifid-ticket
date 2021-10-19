@@ -1,0 +1,125 @@
+mixin card(title, data, metric, link)
+  .card.col-6.col-md-4.col-lg-3(onclick=link?"window.location = '#{link}'":"", class=link&&"cursor-pointer")
+    .card-body
+      p.card-title= title
+      h2.d-inline.pr-2= data
+      -if(metric)
+        span.text-muted.d-inline= metric
+
+mixin notification(info)
+  .alert.alert-warning.alert-dismissible.fade.show.my-0.dalert(role='alert')
+    strong New Reply
+    |  #{info} - 
+    a(href="/tickets" class="alert-link") View Ticket
+    button.close(type='button', data-dismiss='alert', aria-label='Close')
+      span(aria-hidden='true') ×
+
+
+extends dashboard
+
+block elements    
+  h1.pb-4 Dashboard
+  .row
+    .col-12
+      //+notification('Ali replied on your ticket "Error in reader"')
+
+      
+  .row.p-3.mt-3
+    .col-12
+      h2.mb-4.text-muted Tickets (#{ticketStats.total})
+    +card('Open Tickets', ticketStats["Open"], "", "/tickets/?status=Open")
+    +card('In Progress', ticketStats["In Progress"], "", "/tickets/?status=In%20Progress")
+    +card('Pending Customer', ticketStats["Pending Customer"], "", "/tickets/?status=Pending%20Customer")
+    +card('Closed', ticketStats["Closed"], "", "/tickets/?status=Closed")
+    
+  .row.p-3.mt-3
+    .col-12
+      h2.mb-4.text-muted Average Stats 
+    +card('Response Time',  ticketStats.responseTime.adjusted ? ticketStats.responseTime.adjusted[0] : "0", ticketStats.responseTime.adjusted[1])
+    +card('Resolution Time',  ticketStats.resolutionTime.adjusted ? ticketStats.resolutionTime.adjusted[0] : "0", ticketStats.resolutionTime.adjusted[1])
+    +card('Overall Rating', ticketStats.ratings.count ? (ticketStats.ratings.value / ticketStats.ratings.count) : "0", '★')
+
+    
+  -if(user.role == "employee" && otherStats)
+    .row.p-3.mt-3
+      .col-12
+        h2.mb-4.text-muted Total Stats 
+      +card('Customers', otherStats.customers)
+      +card('Companies', otherStats.companies)
+      +card('Projects',  otherStats.projects)
+      +card('Tickets', ticketStats.total)
+
+    .row.p-3.mt-3
+      .col-12.col-md-4.mt-5.border
+        h3.my-2.py-2.text-center.text-muted Projects
+        .tableWrapper
+          table.table
+            tr
+              th Type
+              th.text-right Count
+            if (Object.keys(otherStats.projectByType)).length
+              each key in Object.keys(otherStats.projectByType)
+                tr
+                  td.text-capitalize= key
+                  td.text-right= otherStats.projectByType[key]
+            else
+              tr
+                td.text-center(cols="2") No data available
+        h6.text-right.font-weight-bold.p-2.border-top Total &nbsp;&nbsp; #{otherStats.projects}
+
+
+      .col-12.col-md-8.mt-5.border
+        h3.my-2.py-2.text-center.text-muted Tickets
+        .row
+          .col-12.col-md-6.border
+            .tableWrapper
+              table.table
+                tr
+                  th Project
+                  th.text-right Count
+                if Object.keys(ticketStats.projects).length
+                  each key in Object.keys(ticketStats.projects)
+                    tr
+                      td.text-capitalize= key
+                      td.text-right= ticketStats.projects[key]
+                else
+                  tr
+                    td.text-center(cols="2") No data available
+            h6.text-right.font-weight-bold.p-2.border-top Total &nbsp;&nbsp; #{ticketStats.total}
+          .col-12.col-md-6.border
+            .tableWrapper
+              table.table
+                tr
+                  th Company
+                  th.text-right Count
+                if Object.keys(ticketStats.companies).length
+                  each key in Object.keys(ticketStats.companies)
+                    tr
+                      td.text-capitalize= key
+                      td.text-right= ticketStats.companies[key]
+                else
+                  tr
+                    td.text-center(cols="2") No data available
+            h6.text-right.font-weight-bold.p-2.border-top Total &nbsp;&nbsp; #{ticketStats.total}
+
+
+      .col-12.mt-5.border
+        h3.my-2.py-2.text-center.text-muted Latest Reviews
+        .list-group
+          if ticketStats.reviews.length
+            each review in ticketStats.reviews
+              a.list-group-item.list-group-item-action.flex-column.align-items-start(href='/tickets/#{review.ticketId}')
+                .d-flex.w-100.justify-content-between
+                  h5.mb-1= review.name
+                  small= review.company
+                p.mb-1= review.description
+                small= review.rating
+          else
+            .d-flex.w-100.justify-content-between
+              p.text-center.p-5.w-100 No reviews available
+
+
+
+
+
+

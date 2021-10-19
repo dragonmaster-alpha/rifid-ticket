@@ -1,0 +1,35 @@
+extends dashboard
+
+block elements
+  h1 Edit Ticket
+  form.mt-5.uploadForm(enctype="multipart/form-data" method="post", action='/tickets/edit/#{ticket._id}', name="uploadForm")
+    input(type='hidden', name='id', value=ticket._id)
+    .form-group.row
+      label.col-sm-2.col-form-label.col-form-label-lg(for='title') Title
+      .col-sm-10
+        input#title.form-control.form-control-lg(type='text', placeholder='What is this ticket about?', name='title', value=ticket.title, required)
+    if user.permissions == "admin"
+      .form-group.row
+        label.col-sm-2.col-form-label.col-form-label-lg(for='priority') Priority
+        .col-sm-10
+          select#priority.form-control.form-control-lg(name='priority', required)
+            option(value='low', selected=ticket.priority=="low") Low
+            option(value='medium', selected=ticket.priority=="medium") Medium
+            option(value='high', selected=ticket.priority=="high") High
+      .form-group.row
+        label.col-sm-2.col-form-label.col-form-label-lg(for='type') Type
+        .col-sm-10
+          select#type.form-control.form-control-lg(name='type', required)
+            option(value='visit', selected=ticket.type=="visit") Visit
+            option(value='online', selected=ticket.type=="online") Online
+      .form-group.row
+        label.col-sm-2.col-form-label.col-form-label-lg(for='users') Users
+        .col-sm-10
+          select#users.form-control.form-control-lg(multiple, name='users', required)
+            each user in users
+              if ticket.users.indexOf(user._id.toString()) > -1
+                option(value=user._id selected)= user.name
+              else
+                option(value=user._id)= user.name
+
+    button.btn.btn-lg.btn-success.float-right.mt-3(type='submit') Update Ticket

@@ -1,0 +1,40 @@
+extends dashboard
+
+block elements
+  h1 Edit Task
+  form.mt-5.uploadForm(enctype="multipart/form-data" method="post", action='/tasks/edit/#{task._id}', name="uploadForm")
+    .form-group.row
+      label.col-sm-2.col-form-label.col-form-label-lg(for='type') Type
+      .col-sm-10
+        select#type.form-control.form-control-lg(name='type', required) 
+          option(value='call', selected=task.type=='call') Call
+          option(value='email', selected=task.type=='email') Email
+          option(value='operation', selected=task.type=='operation') Operation
+          option(value='develop', selected=task.type=='develop') Develop          
+    .form-group.row
+      label.col-sm-2.col-form-label.col-form-label-lg(for='description') Description
+      .col-sm-10
+        input#description.form-control.form-control-lg(type='text', placeholder='What is this task about?', name='description', value=task.description, required)
+    .form-group.row
+      label.col-sm-2.col-form-label.col-form-label-lg(for='employee') Assign To
+      .col-sm-10
+        select#employee.form-control.form-control-lg(name='employee', required)
+          each employee in employees
+            option(value=employee._id, selected=employee._id.toString()==task.employee._id.toString())= employee.name
+    .form-group.row
+      label.col-sm-2.col-form-label.col-form-label-lg(for='contact') Contacts
+      .col-sm-10
+        select#contact.form-control.form-control-lg(name='contact')
+          if task.contact
+            each contact in contacts
+              option(value=contact._id, selected=contact._id.toString()==task.contact._id.toString())= contact.name
+          else
+            each contact in contacts
+              option(value=contact._id)= contact.name            
+    .form-group.row
+      label.col-sm-2.col-form-label.col-form-label-lg(for='attachments') Attachments
+      .col-sm-10
+        input#attachments.form-control.form-control-lg(type='file', onchange="onInputChange(this);", name='attachments', val)
+        .files
+
+    button.btn.btn-lg.btn-success.float-right.mt-3(type='submit') Edit Task

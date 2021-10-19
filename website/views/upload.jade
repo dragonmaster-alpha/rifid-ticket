@@ -1,0 +1,28 @@
+extends layout
+
+block content
+  include ./header.jade
+  section.container-fluid.main.login
+    div.color-overlay
+    div.row.justify-content-end
+      div.col-12.col-md-6.p-5.mt-5
+        h1 Welcome to
+          br
+          | Support Ticketing System
+        form.my-4.p-4(method='GET' action='/dashboard')
+          != messages('my_message_template', locals)
+          h2 Login Panel
+          div.form-group.mt-3
+            input.form-control(type='email' id='email'  aria-describedby='emailHelp' placeholder='Username')
+            small.form-text.text-muted(id='emailHelp')
+          div.form-group.mt-3 
+            input.form-control(type='password' id='password'  aria-describedby='passwordHelp' placeholder='Password')
+            small.form-text.text-muted(id='passwordHelp')
+          button.btn.btn-primary.btn-block(type='submit') Login
+        p RFID Solutions tracks the best in RFID Technology to make it easy for our clients to gain the greatest benefits with the least possible risk.
+        p RFID Solutions Egypt is the ideal partner when implementing your RFID projects from 2014.
+
+
+
+ //h1= title
+ //p Welcome to #{title}

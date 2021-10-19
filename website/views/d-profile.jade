@@ -1,0 +1,41 @@
+extends dashboard
+
+block elements
+    .row
+      .col-12
+        h1.my-4 Company Profile 
+      .col-12
+        table.table
+          tr
+            th Company
+            th(colspan=3) Projects
+          each company in companies
+            tr(rowspan=company.projects.length)
+              td= company.name
+              td
+                each project in company.projects
+                  if project.project
+                    | #{project.project.name} - 
+                    | #{project.type} - 
+                    | #{project.expiration}
+                    br
+                  else
+                    | Project Deleted
+      .col-12
+        h1.my-4 User Profile 
+          a.btn.btn-outline-danger.float-right(href="javascript: void()", ondblclick="window.location = '/resetPassword/#{user._id}'") Double Click To Reset Password
+      .col-12.mt-3
+        form(action="/profile" method="POST")
+          .form-group.row
+            label.col-sm-2.col-form-label.col-form-label-lg(for='name') Name
+            .col-sm-10
+              input#name.form-control.form-control-lg(type='text', name='name', placeholder='Your Name' value=user.name)
+          .form-group.row
+            label.col-sm-2.col-form-label.col-form-label-lg(for='email') Email
+            .col-sm-10
+              input#email.form-control.form-control-lg(type='email', name='email', placeholder='Your Email' value=user.email)
+          .form-group.row
+            label.col-sm-2.col-form-label.col-form-label-lg(for='phone') Mobile
+            .col-sm-10
+              input#phone.form-control.form-control-lg(type='text', name='phone', placeholder='Your Mobile' value=user.phone)
+           button.btn.btn-lg.btn-success.float-right.mt-3(type='submit') Update

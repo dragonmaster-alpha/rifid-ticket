@@ -1,0 +1,34 @@
+server {
+  server_name tickets.rfidegypt.com;
+
+  location / {
+    root /path/to/root;
+    client_max_body_size 5m;
+#    index index.html;
+    try_files $uri $uri/ @express; # instead of 404, proxy back to express using a named location block;
+    # source: https://stackoverflow.com/a/15467555/8436941
+  }
+
+  location @express {
+    proxy_pass http://localhost:3000;
+  }
+
+    listen 443 ssl; # managed by Certbot
+    ssl_certificate /etc/letsencrypt/live/tickets.rfidegypt.com/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/tickets.rfidegypt.com/privkey.pem; # managed by Certbot
+    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+
+}
+server {
+    if ($host = tickets.rfidegypt.com) {
+        return 301 https://$host$request_uri;
+    } # managed by Certbot
+
+
+  listen 80;
+  server_name tickets.rfidegypt.com;
+    return 404; # managed by Certbot
+
+
+}

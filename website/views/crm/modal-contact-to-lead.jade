@@ -1,0 +1,36 @@
+#modal-contact-to-lead.modal.fade(tabindex='-1', role='dialog', aria-labelledby='modal-contact-to-lead', aria-hidden='false')
+  .modal-dialog(role='document')
+    .modal-content
+      .modal-header 
+        h5#modal-contact-to-lead.modal-title Create Lead
+        button.close(type='button', data-dismiss='modal', aria-label='Close')
+          span(aria-hidden='true') ×
+      .modal-body
+        form.modal-form(action="/crm/api/leads", method="post")
+          .form-group
+            label(for='form-contact') Contact Name
+            input#form-contact.form-control.text-capitalize(name='contact', data-validate=".{2,}", data-message="Name can't be empty", type='text', placeholder='Contact Name', data-model="name", disabled)
+            input(type="hidden", name="contact_id", data-validate=".{6,}", data-message="Please refresh the page and try again", data-model="_id")
+          .form-group
+            label(for='form-source') Source 
+            select#form-source.form-control(name="source", data-validate=".*", data-message="Please select the source",onchange="this.value == 'Other' ? $('#form-source-other').removeClass('d-none') && $('#form-source-other').attr('required', true) :  $('#form-source-other').addClass('d-none') && $('#form-source-other').attr('required', false)", required)
+              option(value="Website") Website
+              option(value="Social media") Social Media
+              option(value="Recommendations") Recommendations
+              option(value="Other") Other
+            input#form-source-other.form-control.d-none(name="source_other", type="text", placeholder="Please mention source here")
+
+          .form-group
+            label(for='form-company') Company
+            input#form-company.form-control(name="company", data-validate=".{2,}", data-message="Please enter a company name at least 2 characters", type='text', placeholder='Company Name', data-model="company", onkeyup="modals.companyChange()", )
+            input#form-company-id(type="hidden", name="company_id", value="null")
+            span.text-muted.d-block.p2.pt-3.form-companies-msg Select a company or a new company will be created
+            span.form-companies.mt-2(data-load-data="/crm/api/companies")
+              //a.badge.badge-dark.m-1(href="#") Dark
+
+          .form-group
+            label(for='form-project') Projects
+            select#form-project.form-control(name="projects", data-validate=".{3,}", data-message="Please select at least one project", multiple, data-load-data="/crm/api/projects", )
+
+          button.btn.btn-primary.float-right(type="submit") Create Lead
+  

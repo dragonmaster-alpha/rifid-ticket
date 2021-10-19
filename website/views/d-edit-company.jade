@@ -1,0 +1,91 @@
+extends dashboard
+
+block elements
+  h1 Edit Company
+  form.mt-5(action='/companies/edit/#{company._id}', method='POST')
+    .form-group.row
+      label.col-sm-2.col-form-label.col-form-label-lg(for='name') Name
+      .col-sm-10
+        input#name.form-control.form-control-lg(type='text', required, name='name' placeholder='Company Name', value=company.name)
+        input(type='hidden', name='oldname' value=company.name)
+    .form-group.row.mt-4
+      label.col-2.col-form-label.col-form-label-lg.mt-2 Projects
+      .col-2
+        button#addCompanyProject.btn.btn-outline-danger.m-3.m-sm-0.mt-sm-3(type='button') Add
+      .col-sm-8.projectsContainer
+        each curproject in company.projects
+          .row.my-2.addCompany
+            .col-12.my-2
+              p Project
+              select.form-control.form-control-lg.companyProject(name='project', disabled=curproject.hold, onchange='validateProjects(this); companyContactPerson()')
+                each project in projects
+                  if curproject.project && curproject.project._id.toString() == project._id.toString()
+                    option(value=project._id selected)= project.name
+                  else
+                    option(value=project._id)= project.name  
+              span.d-block.pt-2.text-danger 
+            .col-12.my-2
+              p Support Type
+              select.form-control.form-control-lg(name='support', disabled=curproject.hold)
+                each support in supportType
+                  if curproject.type == support.value
+                    option(value=support.value selected)= support.label
+                  else
+                    option(value=support.value)= support.label
+            .col-12.my-2
+              p Start Date
+              input.form-control.form-control-lg.datepicker-here(type='text' placeholder='Start Date' data-position='bottom left' data-language='en' name='start', value=(curproject.start || ""), data-ivalue=(curproject.start || ""), disabled=curproject.hold, required)
+            .col-12.my-2
+              p End Date
+              input.form-control.form-control-lg.datepicker-here(type='text' placeholder='Expires on' data-position='bottom left' data-language='en' name='expiration' value=curproject.expiration, data-ivalue=(curproject.expiration || ""), disabled=curproject.hold, required)
+            .col-12.my-2
+              p Contact Person
+              select.form-control.form-control-lg(name='contact', value="", disabled=curproject.hold)
+                option 
+                if users.length
+                  each puser in users
+                    option(value=puser._id, data-projects=puser.projects.join(','), selected=curproject.contact ? curproject.contact.toString()==puser._id.toString() : false)= puser.name
+            .col-12.my-2
+              input(type='hidden', name='hold', value=(curproject.hold || "null"))
+              if curproject.hold
+                button.btn.btn-warning.mt-2.float-left(ondblclick='window.location = "/companies/unhold/#{company._id}/#{curproject._id}"', type='button') Stop Hold
+              else
+                button.btn.btn-outline-warning.mt-2.float-left(ondblclick='window.location = "/companies/hold/#{company._id}/#{curproject._id}"', type='button') Set On-Hold
+                button.btn.btn-danger.mt-2.float-right(ondblclick='$(this).parent().parent().remove();' type='button')  Remove Project
+            .col-12.my-2
+              hr.my-5
+    button.btn.btn-lg.btn-success.float-right(type='submit') Update Company
+
+
+    div.d-none
+      .row.my-2.addCompanyTemplate
+        .col-12.my-2
+          p Project
+          select.form-control.form-control-lg.companyProject(name='project', onchange='validateProjects(this); companyContactPerson()')
+            each project in projects
+              option(value=project._id)= project.name  
+          span.d-block.pt-2.text-danger 
+        .col-12.my-2
+          p Support Type
+          select.form-control.form-control-lg(name='support')
+            each support in supportType
+              option(value=support.value)= support.label
+        .col-12.my-2
+          p Start Date
+          input.form-control.form-control-lg.datepicker-here(type='text' placeholder='Start Date' data-position='bottom left' data-language='en' name='start' required)
+        .col-12.my-2
+          p End Date
+          input.form-control.form-control-lg.datepicker-here(type='text' placeholder='Expires on' data-position='bottom left' data-language='en' name='expiration' required)
+        .col-12.my-2
+          p Contact Person
+          select.form-control.form-control-lg(name='contact', value="")
+            option 
+            if users.length
+              each puser in users
+                option(value=puser._id, data-projects=puser.projects.join(','))= puser.name
+        .col-12.my-2
+          button.btn.btn-danger.mt-2.float-right(ondblclick='$(this).parent().parent().remove();' type='button')  Remove Project  
+        .col-12.my-2
+          hr.my-5
+          input(type='hidden', name='hold', value="null")
+            

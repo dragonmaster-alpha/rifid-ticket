@@ -1,0 +1,28 @@
+extends dashboard
+
+block elements
+    .row
+      .col-12
+        h1.my-4 Close Ticket
+      .col-12
+        dl
+          dt Ticket Title
+          dd.mb-4= ticket.title
+          dt Ticket Date
+          dd.mb-4= ticket.created_at.toLocaleString().replace(" ", " - ")
+          dt Initial Problem
+          dd.mb-4= ticket.threads[0].message
+
+      .col-12.mt-3
+        form(action="/tickets/changeStatus/#{ticket._id}" method="POST")
+          .form-group.row
+            .col-12
+             h6 was the problem resolved?
+             input(type='hidden', name='status', value='Closed')
+             .custom-control.custom-radio.custom-control-inline
+               input#yes.custom-control-input(type='radio', name='resolved', value='true')
+               label.custom-control-label(for='yes') Yes, close this ticket
+             .custom-control.custom-radio.custom-control-inline
+               input#no.custom-control-input(type='radio', name='resolved', value='false', checked)
+               label.custom-control-label(for='no') No, don't close this ticket
+           button.btn.btn-lg.btn-success.float-right.mt-3(type='submit') Confirm
